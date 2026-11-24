@@ -4,7 +4,7 @@
 
 AFTERHOURS is a neon survival arcade game that runs entirely in the browser. Every eight seconds the system replays your last eight seconds of movement as a hostile echo — a ghost that copies your path, collects energy and hunts the same hostiles you do. Learn to use your own past, or be buried by it.
 
-[**Play the live game →**](https://afterhours-arcade.pages.dev)
+[**Play the live game →**](https://afterhours-arcade-9tt.pages.dev)
 
 ![AFTERHOURS main menu](docs/screenshots/menu.png)
 
@@ -136,7 +136,7 @@ It covers seeded RNG reproducibility, daily seed and weekday modifiers, echo rec
 
 ## Deploy to Cloudflare Pages
 
-The live build is hosted on Cloudflare Pages at **https://afterhours-arcade.pages.dev**.
+The live build is hosted on Cloudflare Pages at **https://afterhours-arcade-9tt.pages.dev**.
 
 Manual deploy with Wrangler:
 
