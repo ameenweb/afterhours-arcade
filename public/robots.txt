@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://afterhours-arcade-9tt.pages.dev/sitemap.xml
