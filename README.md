@@ -2,7 +2,7 @@
 
 **Your past is your biggest enemy.**
 
-AFTERHOURS is a neon survival arcade game that runs entirely in the browser. Every eight seconds the system replays your last eight seconds of movement as a hostile echo — a ghost that copies your path, collects energy and hunts the same hostiles you do. Learn to use your own past, or be buried by it.
+AFTERHOURS is a neon survival arcade game that runs entirely in the browser. Every eight seconds the system replays your last eight seconds of movement as an echo — a ghost that copies your path, collects energy and hunts the same hostiles you do. Learn to use your own past, or be buried by it.
 
 [**Play the live game →**](https://afterhours-arcade-9tt.pages.dev)
 
