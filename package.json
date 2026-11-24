@@ -4,6 +4,24 @@
   "version": "1.0.0",
   "type": "module",
   "description": "A neon survival arcade browser game where your past becomes your biggest enemy.",
+  "author": "Ameen (ameenweb)",
+  "license": "MIT",
+  "homepage": "https://afterhours-arcade-9tt.pages.dev",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ameenweb/afterhours-arcade.git"
+  },
+  "keywords": [
+    "game",
+    "arcade",
+    "canvas",
+    "neon",
+    "browser-game",
+    "vite"
+  ],
+  "engines": {
+    "node": ">=20.19"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
