@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#080812" />
+    <meta name="color-scheme" content="dark" />
+    <title>AFTERHOURS — Your past is your biggest enemy</title>
+    <meta
+      name="description"
+      content="AFTERHOURS is a neon survival arcade game. Collect energy, dodge hostile programs and survive the echoes of your own past. Play free in your browser."
+    />
+    <meta property="og:title" content="AFTERHOURS — Neon Survival Arcade" />
+    <meta
+      property="og:description"
+      content="Your past is your biggest enemy. Every 8 seconds, a ghost of your past movements returns. Use it. Survive it."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="./assets/og-card.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg" />
+    <link rel="stylesheet" href="./src/styles/main.css" />
+  </head>
+  <body>
+    <div id="app" class="app">
+      <canvas id="game" aria-label="AFTERHOURS game arena"></canvas>
+
+      <div class="fx-layer" aria-hidden="true">
+        <div class="fx-scanlines"></div>
+        <div class="fx-vignette"></div>
+        <div class="fx-grain"></div>
+        <div id="fx-flash" class="fx-flash"></div>
+      </div>
+
+      <!-- ============================== HUD ============================== -->
+      <div id="hud" class="hud is-hidden" aria-live="off">
+        <div class="hud-top">
+          <div class="hud-block hud-score-block">
+            <span class="hud-label">SCORE</span>
+            <strong id="hud-score" class="hud-score">0</strong>
+            <span class="hud-best">BEST <b id="hud-best">0</b></span>
+          </div>
+
+          <div class="hud-center">
+            <div class="hud-mode" id="hud-mode">CLASSIC SURVIVAL</div>
+            <div class="hud-time" id="hud-time">00:00</div>
+            <div class="hud-echo-track" title="Time until your next echo">
+              <span class="hud-label">NEXT ECHO</span>
+              <div class="hud-track"><i id="hud-echo-fill"></i></div>
+              <span id="hud-echo-count" class="hud-echo-count">0 ECHOES</span>
+            </div>
+          </div>
+
+          <div class="hud-right">
+            <div class="hud-block hud-right-inner">
+              <span class="hud-label">SYSTEM</span>
+              <span id="hud-event" class="hud-event">STABLE</span>
+              <span class="hud-best">RUN <b id="hud-run-id">----</b></span>
+            </div>
+            <button id="btn-pause" class="icon-btn" type="button" data-action="pause" aria-label="Pause game" title="Pause (Esc)">
+              <span></span><span></span>
+            </button>
+          </div>
+        </div>
+
+        <div class="hud-combo" id="hud-combo">
+          <div class="combo-main">
+            <span id="hud-mult" class="combo-mult">x1</span>
+            <span id="hud-combo-count" class="combo-count">CHAIN 0</span>
+          </div>
+          <div class="combo-track"><i id="hud-combo-fill"></i></div>
+        </div>
+
+        <div class="hud-bottom">
+          <div class="hud-vitals">
+            <div class="vital-row">
+              <span class="hud-label">INTEGRITY</span>
+              <span id="hud-health-text" class="vital-value">100</span>
+            </div>
+            <div class="health-track"><i id="hud-health-fill"></i></div>
+            <div id="hud-shield" class="shield-row" aria-label="Shield charges"></div>
+          </div>
+
+          <div id="hud-powerups" class="hud-powerups" aria-label="Active power-ups"></div>
+
+          <div class="hud-meters">
+            <div class="meter" id="hud-dash-meter">
+              <div class="meter-head">
+                <span class="hud-label">DASH</span>
+                <span id="hud-dash-label" class="meter-label">READY</span>
+              </div>
+              <div class="meter-track"><i id="hud-dash-fill"></i></div>
+            </div>
+            <div class="meter" id="hud-pulse-meter">
+              <div class="meter-head">
+                <span class="hud-label">PULSE</span>
+                <span id="hud-pulse-label" class="meter-label">0%</span>
+              </div>
+              <div class="meter-track meter-track--pulse"><i id="hud-pulse-fill"></i></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================ BANNERS ============================ -->
+      <div id="banner" class="banner is-hidden" role="status" aria-live="assertive">
+        <span class="banner-kicker" id="banner-kicker">INCOMING EVENT</span>
+        <strong id="banner-title">BLACKOUT</strong>
+        <span id="banner-sub">VISIBILITY COMPROMISED</span>
+        <div class="banner-timer"><i id="banner-fill"></i></div>
+      </div>
+
+      <div id="countdown" class="countdown is-hidden" aria-live="assertive">
+        <span id="countdown-value">3</span>
+        <small>SYNCING NEURAL LINK</small>
+      </div>
+
+      <div id="toasts" class="toasts" aria-live="polite" aria-atomic="false"></div>
+
+      <!-- ========================= MOBILE CONTROLS ======================== -->
+      <div id="mobile-controls" class="mobile-controls is-hidden">
+        <div id="joystick" class="joystick" aria-label="Virtual joystick">
+          <div class="joystick-ring"></div>
+          <div id="joystick-knob" class="joystick-knob"></div>
+        </div>
+        <div class="touch-actions">
+          <button id="btn-ability" class="touch-btn touch-btn--ability" type="button" aria-label="Use pulse ability">
+            <span class="touch-icon">◈</span>
+            <span class="touch-label">PULSE</span>
+            <i class="touch-fill"></i>
+          </button>
+          <button id="btn-dash" class="touch-btn touch-btn--dash" type="button" aria-label="Dash">
+            <span class="touch-icon">»</span>
+            <span class="touch-label">DASH</span>
+            <i class="touch-fill"></i>
+          </button>
+        </div>
+      </div>
+
+      <div id="rotate-hint" class="rotate-hint is-hidden">
+        <span>ROTATE DEVICE</span>
+        <small>Landscape gives you a wider arena</small>
+      </div>
+
+      <!-- ============================= SCREENS ============================ -->
+      <main class="screens">
+        <!-- MAIN MENU -->
+        <section id="screen-menu" class="screen screen--menu is-active" aria-label="Main menu">
+          <div class="menu-grid">
+            <header class="brand">
+              <div class="brand-kicker"><i></i> NIGHT PROTOCOL // SYSTEM 08</div>
+              <h1 class="logo" data-text="AFTERHOURS">AFTERHOURS</h1>
+              <p class="tagline">YOUR PAST IS YOUR BIGGEST ENEMY.</p>
+              <p class="brand-copy">
+                Every eight seconds, a ghost of your last movements re-enters the arena.
+                It can collect. It can kill. It can save you. Use it well.
+              </p>
+              <div class="menu-record">
+                <div>
+                  <span class="menu-stat-label">PERSONAL BEST</span>
+                  <strong id="menu-best">0</strong>
+                </div>
+                <div>
+                  <span class="menu-stat-label">RUNS LOGGED</span>
+                  <strong id="menu-runs">0</strong>
+                </div>
+                <div>
+                  <span class="menu-stat-label">TIME SURVIVED</span>
+                  <strong id="menu-total-time">00:00</strong>
+                </div>
+              </div>
+              <div class="menu-operatives">
+                <span class="menu-stat-label">ACTIVE OPERATIVE</span>
+                <span id="menu-skin-name" class="operative-name">VOID RUNNER</span>
+              </div>
+            </header>
+
+            <nav class="menu-actions" aria-label="Play modes and menus">
+              <button class="btn btn--primary menu-play" type="button" data-action="play" data-mode="classic">
+                <span class="btn-text">PLAY</span>
+                <span class="btn-sub">CLASSIC SURVIVAL</span>
+                <span class="btn-corner"></span>
+              </button>
+
+              <button class="btn btn--daily" type="button" data-action="play" data-mode="daily">
+                <span class="btn-row"><span class="btn-text">DAILY CHALLENGE</span><span class="pill" id="daily-state">OPEN</span></span>
+                <span class="btn-sub"><span id="menu-daily-date">—</span> · <span id="menu-daily-best">NO RUN</span></span>
+              </button>
+
+              <button class="btn btn--ghost" type="button" data-action="play" data-mode="practice">
+                <span class="btn-row"><span class="btn-text">PRACTICE</span><span class="pill pill--dim">TRAINING</span></span>
+                <span class="btn-sub">LOWER THREAT · NO RECORDS</span>
+              </button>
+
+              <div class="menu-row">
+                <button class="btn btn--small" type="button" data-action="howto"><span class="btn-text">HOW TO PLAY</span></button>
+                <button class="btn btn--small" type="button" data-action="stats"><span class="btn-text">STATS</span></button>
+              </div>
+              <div class="menu-row">
+                <button class="btn btn--small" type="button" data-action="skins"><span class="btn-text">SKINS</span></button>
+                <button class="btn btn--small" type="button" data-action="settings"><span class="btn-text">SETTINGS</span></button>
+              </div>
+
+              <div class="menu-footer">
+                <span><i class="dot dot--cyan"></i> ECHO LOOP 8.0s</span>
+                <span><i class="dot dot--purple"></i> LOCAL SAVE</span>
+                <span>v1.0.0</span>
+              </div>
+            </nav>
+          </div>
+        </section>
+
+        <!-- HOW TO PLAY -->
+        <section id="screen-howto" class="screen" aria-label="How to play">
+          <div class="panel panel--wide">
+            <div class="panel-head">
+              <span class="panel-kicker">TRAINING MANUAL</span>
+              <h2>HOW TO SURVIVE</h2>
+              <button class="btn btn--back" type="button" data-action="back" data-back="menu" aria-label="Back to main menu">← BACK</button>
+            </div>
+
+            <div class="howto-grid">
+              <article class="info-card info-card--accent">
+                <span class="info-num">01</span>
+                <h3>THE ECHO LOOP</h3>
+                <p>
+                  Your movement is recorded continuously. Every <strong>8 seconds</strong>, an echo
+                  of your previous 8 seconds spawns and replays it exactly. Up to several echoes
+                  can be alive at once.
+                </p>
+                <div class="echo-diagram" aria-hidden="true">
+                  <div class="diagram-track"><i></i><i></i><i></i><i></i><i></i></div>
+                  <span class="diagram-player"></span>
+                  <span class="diagram-echo e1"></span>
+                  <span class="diagram-echo e2"></span>
+                  <span class="diagram-label">8s RECORDING → GHOST REPLAY</span>
+                </div>
+                <p class="tip">
+                  <b>ECHOES CAN:</b> collect orbs, charge relay switches, destroy enemies.
+                  Enemies are attracted to them. They are your decoys, weapons and keys.
+                </p>
+              </article>
+
+              <article class="info-card">
+                <span class="info-num">02</span>
+                <h3>CONTROLS</h3>
+                <div class="control-list">
+                  <div><span class="key">WASD</span><span class="key">↑←↓→</span><span>Move</span></div>
+                  <div><span class="key">SPACE</span><span>Dash (brief invulnerability)</span></div>
+                  <div><span class="key">E</span><span>Pulse — full charge required</span></div>
+                  <div><span class="key">ESC</span><span>Pause</span></div>
+                </div>
+                <p class="tip">On touch devices use the virtual stick and the two action buttons. Joystick side can be swapped in Settings.</p>
+                <div class="control-list control-list--modes">
+                  <div><span class="pill">CLASSIC</span><span>Endless, escalating threat.</span></div>
+                  <div><span class="pill">DAILY</span><span>Same seed for everyone, every UTC day.</span></div>
+                  <div><span class="pill">PRACTICE</span><span>Slower enemies, no records.</span></div>
+                </div>
+              </article>
+
+              <article class="info-card">
+                <span class="info-num">03</span>
+                <h3>THREAT INDEX</h3>
+                <ul class="threat-list">
+                  <li><span class="threat-glyph threat-glyph--hunter"></span><div><b>HUNTER</b><small>Relentless pursuit.</small></div></li>
+                  <li><span class="threat-glyph threat-glyph--interceptor"></span><div><b>INTERCEPTOR</b><small>Predicts your path.</small></div></li>
+                  <li><span class="threat-glyph threat-glyph--sentry"></span><div><b>SENTRY</b><small>Patrols and fires bolts.</small></div></li>
+                  <li><span class="threat-glyph threat-glyph--glitch"></span><div><b>GLITCH</b><small>Unstable. Unpredictable.</small></div></li>
+                </ul>
+                <p class="tip">Dashing through an enemy destroys it. So does an echo's touch. Your pulse clears everything nearby.</p>
+              </article>
+
+              <article class="info-card">
+                <span class="info-num">04</span>
+                <h3>SYSTEM EVENTS</h3>
+                <ul class="event-list">
+                  <li><b class="c-red">BLACKOUT</b><span>Vision collapses around you.</span></li>
+                  <li><b class="c-cyan">DOUBLE ECHO</b><span>Echo output doubles. Crowd the arena.</span></li>
+                  <li><b class="c-purple">GLITCH</b><span>Arena geometry destabilises.</span></li>
+                  <li><b class="c-amber">OVERLOAD</b><span>More energy. Faster hostiles.</span></li>
+                  <li><b class="c-lav">INVERT</b><span>Your movement vectors flip.</span></li>
+                </ul>
+                <p class="tip">A three-second alarm always precedes an event. Read the warning, plan your route.</p>
+              </article>
+            </div>
+            <div class="panel-actions">
+              <button class="btn btn--primary" type="button" data-action="play" data-mode="classic"><span class="btn-text">START RUN</span></button>
+              <button class="btn btn--ghost" type="button" data-action="back" data-back="menu"><span class="btn-text">MAIN MENU</span></button>
+            </div>
+          </div>
+        </section>
+
+        <!-- SETTINGS -->
+        <section id="screen-settings" class="screen" aria-label="Settings">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="panel-kicker">SYSTEM CONFIG</span>
+              <h2>SETTINGS</h2>
+              <button class="btn btn--back" type="button" data-action="back" data-back="menu" aria-label="Back">← BACK</button>
+            </div>
+
+            <div class="settings-list">
+              <div class="setting-row">
+                <div class="setting-copy"><b>SOUND EFFECTS</b><span>Orbs, impacts, echoes and alarms.</span></div>
+                <div class="setting-control">
+                  <input id="set-sound" type="range" min="0" max="100" step="1" value="80" aria-label="Sound effects volume" />
+                  <output id="set-sound-value" for="set-sound">80%</output>
+                </div>
+              </div>
+              <div class="setting-row">
+                <div class="setting-copy"><b>MUSIC</b><span>Original synthesized synthwave.</span></div>
+                <div class="setting-control">
+                  <input id="set-music" type="range" min="0" max="100" step="1" value="55" aria-label="Music volume" />
+                  <output id="set-music-value" for="set-music">55%</output>
+                </div>
+              </div>
+              <div class="setting-row">
+                <div class="setting-copy"><b>VISUAL EFFECTS</b><span>Particle density and glow layers.</span></div>
+                <div class="setting-control">
+                  <div class="segmented" role="group" aria-label="Visual effects level">
+                    <button type="button" data-action="effects" data-value="high">FULL</button>
+                    <button type="button" data-action="effects" data-value="low">LOW</button>
+                  </div>
+                </div>
+              </div>
+              <div class="setting-row">
+                <div class="setting-copy"><b>REDUCED MOTION</b><span>Removes shake, heavy particles and menu animation.</span></div>
+                <div class="setting-control">
+                  <button class="toggle" type="button" id="set-reduced" data-action="toggle" data-key="reducedMotion" role="switch" aria-checked="false"><span></span></button>
+                </div>
+              </div>
+              <div class="setting-row">
+                <div class="setting-copy"><b>SCREEN SHAKE</b><span>Impact feedback on hits and pulses.</span></div>
+                <div class="setting-control">
+                  <button class="toggle" type="button" id="set-shake" data-action="toggle" data-key="screenShake" role="switch" aria-checked="true"><span></span></button>
+                </div>
+              </div>
+              <div class="setting-row">
+                <div class="setting-copy"><b>LEFT-HANDED LAYOUT</b><span>Mirrors touch controls.</span></div>
+                <div class="setting-control">
+                  <button class="toggle" type="button" id="set-lefty" data-action="toggle" data-key="leftHanded" role="switch" aria-checked="false"><span></span></button>
+                </div>
+              </div>
+              <div class="setting-row">
+                <div class="setting-copy"><b>DASH KEY</b><span>Click, then press a key.</span></div>
+                <div class="setting-control">
+                  <button class="keybind" type="button" id="key-dash" data-action="keybind" data-key="dash">SPACE</button>
+                </div>
+              </div>
+              <div class="setting-row">
+                <div class="setting-copy"><b>PULSE KEY</b><span>Click, then press a key.</span></div>
+                <div class="setting-control">
+                  <button class="keybind" type="button" id="key-ability" data-action="keybind" data-key="ability">E</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel-actions panel-actions--spread">
+              <button class="btn btn--danger btn--small" type="button" data-action="reset-progress"><span class="btn-text">RESET ALL PROGRESS</span></button>
+              <button class="btn btn--primary btn--small" type="button" data-action="back" data-back="menu"><span class="btn-text">DONE</span></button>
+            </div>
+          </div>
+        </section>
+
+        <!-- STATS -->
+        <section id="screen-stats" class="screen" aria-label="Statistics and achievements">
+          <div class="panel panel--wide">
+            <div class="panel-head">
+              <span class="panel-kicker">OPERATIVE RECORD</span>
+              <h2>STATISTICS</h2>
+              <button class="btn btn--back" type="button" data-action="back" data-back="menu" aria-label="Back">← BACK</button>
+            </div>
+
+            <div id="stats-grid" class="stats-grid"></div>
+
+            <div class="stats-columns">
+              <div>
+                <h3 class="section-title">ACHIEVEMENTS <span id="achievement-count" class="section-count">0/0</span></h3>
+                <div id="achievements-list" class="achievements-list"></div>
+              </div>
+              <div>
+                <h3 class="section-title">DAILY LOG</h3>
+                <div id="daily-history" class="daily-history"></div>
+                <div class="daily-note">
+                  <p>Daily challenges use a shared UTC seed. Everyone receives the same arena, modifiers and event schedule for that date.</p>
+                  <p id="stats-daily-streak" class="daily-streak">STREAK 0 DAYS</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel-actions">
+              <button class="btn btn--ghost btn--small" type="button" data-action="skins"><span class="btn-text">SKINS</span></button>
+              <button class="btn btn--primary btn--small" type="button" data-action="play" data-mode="classic"><span class="btn-text">PLAY</span></button>
+            </div>
+          </div>
+        </section>
+
+        <!-- SKINS -->
+        <section id="screen-skins" class="screen" aria-label="Operative skins">
+          <div class="panel panel--wide">
+            <div class="panel-head">
+              <span class="panel-kicker">OPERATIVE LOADOUT</span>
+              <h2>SKINS</h2>
+              <button class="btn btn--back" type="button" data-action="back" data-back="menu" aria-label="Back">← BACK</button>
+            </div>
+            <p class="panel-lede">Unlock operatives by playing. No purchases, no timers. Active: <b id="skin-current">VOID RUNNER</b></p>
+            <div id="skins-grid" class="skins-grid"></div>
+          </div>
+        </section>
+
+        <!-- PAUSE -->
+        <section id="screen-pause" class="screen screen--overlay" aria-label="Game paused">
+          <div class="panel panel--compact">
+            <div class="panel-head panel-head--center">
+              <span class="panel-kicker">SYSTEM HALTED</span>
+              <h2>PAUSED</h2>
+            </div>
+            <div class="pause-stats">
+              <div><span>SCORE</span><b id="pause-score">0</b></div>
+              <div><span>TIME</span><b id="pause-time">00:00</b></div>
+              <div><span>ECHOES</span><b id="pause-echoes">0</b></div>
+            </div>
+            <div class="panel-actions panel-actions--stack">
+              <button class="btn btn--primary" type="button" data-action="resume"><span class="btn-text">RESUME</span></button>
+              <button class="btn btn--ghost" type="button" data-action="restart"><span class="btn-text">RESTART RUN</span></button>
+              <button class="btn btn--ghost" type="button" data-action="settings"><span class="btn-text">SETTINGS</span></button>
+              <button class="btn btn--ghost" type="button" data-action="quit"><span class="btn-text">MAIN MENU</span></button>
+            </div>
+            <p class="panel-hint">Press <span class="key">ESC</span> to resume</p>
+          </div>
+        </section>
+
+        <!-- GAME OVER -->
+        <section id="screen-gameover" class="screen screen--overlay" aria-label="Game over">
+          <div class="panel panel--gameover">
+            <div class="panel-head panel-head--center">
+              <span class="panel-kicker" id="go-kicker">CONNECTION TERMINATED</span>
+              <h2 class="gameover-title" id="go-title">SIGNAL LOST</h2>
+              <div id="go-record" class="record-badge is-hidden">NEW PERSONAL BEST</div>
+            </div>
+
+            <div class="gameover-score">
+              <span>FINAL SCORE</span>
+              <strong id="go-score">0</strong>
+              <span class="gameover-best">BEST <b id="go-best">0</b></span>
+            </div>
+
+            <div id="go-daily" class="daily-result is-hidden"></div>
+
+            <div class="result-grid">
+              <div><span>SURVIVED</span><b id="go-time">00:00</b></div>
+              <div><span>ECHOES</span><b id="go-echoes">0</b></div>
+              <div><span>ORBS</span><b id="go-orbs">0</b></div>
+              <div><span>BEST CHAIN</span><b id="go-combo">x1</b></div>
+              <div><span>HOSTILES</span><b id="go-kills">0</b></div>
+              <div><span>PARADOX KILLS</span><b id="go-echo-kills">0</b></div>
+            </div>
+
+            <div class="panel-actions">
+              <button class="btn btn--primary" type="button" data-action="retry"><span class="btn-text">RETRY</span><span class="btn-sub" id="go-retry-sub">CLASSIC SURVIVAL</span></button>
+              <button class="btn btn--ghost" type="button" data-action="quit"><span class="btn-text">MAIN MENU</span></button>
+            </div>
+            <p class="panel-hint" id="go-hint">Press <span class="key">ENTER</span> to retry · <span class="key">ESC</span> for menu</p>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <noscript>
+      <div style="position: fixed; inset: 0; display: grid; place-items: center; background: #080812; color: #f8f7ff; font-family: monospace; text-align: center; padding: 24px; z-index: 999;">
+        AFTERHOURS requires JavaScript. Enable it to enter the arena.
+      </div>
+    </noscript>
+
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>

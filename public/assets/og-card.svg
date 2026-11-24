@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="AFTERHOURS — Your past is your biggest enemy">
+  <defs>
+    <radialGradient id="sky" cx="50%" cy="42%" r="72%">
+      <stop offset="0" stop-color="#191038"/>
+      <stop offset="0.55" stop-color="#0a0918"/>
+      <stop offset="1" stop-color="#030308"/>
+    </radialGradient>
+    <linearGradient id="hull" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f5f3ff"/>
+      <stop offset="0.4" stop-color="#a855f7"/>
+      <stop offset="1" stop-color="#22d3ee"/>
+    </linearGradient>
+    <linearGradient id="rule" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#22d3ee" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#22d3ee"/>
+      <stop offset="1" stop-color="#a855f7" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="9" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <pattern id="grid" width="72" height="72" patternUnits="userSpaceOnUse">
+      <path d="M72 0H0V72" fill="none" stroke="#22d3ee" stroke-opacity="0.07"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#sky)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+
+  <circle cx="930" cy="300" r="250" fill="none" stroke="#a855f7" stroke-opacity="0.18"/>
+  <circle cx="930" cy="300" r="170" fill="none" stroke="#22d3ee" stroke-opacity="0.2" stroke-dasharray="6 18"/>
+  <circle cx="930" cy="300" r="300" fill="none" stroke="#22d3ee" stroke-opacity="0.06"/>
+
+  <!-- Echo trail -->
+  <g filter="url(#glow)" opacity="0.9">
+    <path d="M930 178 L1002 350 L930 314 L858 350 Z" fill="url(#hull)" stroke="#f5f3ff" stroke-width="2" stroke-linejoin="round"/>
+    <circle cx="930" cy="292" r="8" fill="#f5f3ff"/>
+    <circle cx="930" cy="292" r="3.4" fill="#22d3ee"/>
+  </g>
+  <g opacity="0.36" fill="none" stroke="#22d3ee" stroke-width="2">
+    <path d="M836 206 L900 354 L836 324 L772 354 Z"/>
+    <path d="M742 234 L798 358 L742 332 L686 358 Z"/>
+  </g>
+  <g opacity="0.16" fill="none" stroke="#a855f7" stroke-width="2">
+    <path d="M650 260 L698 362 L650 340 L602 362 Z"/>
+  </g>
+
+  <!-- Orbs -->
+  <g filter="url(#glow)">
+    <circle cx="1080" cy="196" r="9" fill="#22d3ee"/>
+    <circle cx="1110" cy="430" r="7" fill="#fbbf24"/>
+    <circle cx="804" cy="468" r="6" fill="#22d3ee"/>
+  </g>
+
+  <text x="80" y="118" fill="#22d3ee" font-family="Consolas, 'Courier New', monospace" font-size="17" letter-spacing="7">NIGHT PROTOCOL // SYSTEM 08</text>
+
+  <text x="76" y="268" fill="#f5f3ff" font-family="'Arial Black', Impact, sans-serif" font-size="112" letter-spacing="4">AFTERHOURS</text>
+  <text x="80" y="268" fill="#a855f7" font-family="'Arial Black', Impact, sans-serif" font-size="112" letter-spacing="4" opacity="0.28" transform="translate(4 4)">AFTERHOURS</text>
+
+  <rect x="80" y="306" width="520" height="2" fill="url(#rule)"/>
+
+  <text x="80" y="360" fill="#f5f3ff" font-family="Consolas, 'Courier New', monospace" font-size="26" letter-spacing="3">YOUR PAST IS YOUR BIGGEST ENEMY.</text>
+  <text x="80" y="402" fill="#8f8aa9" font-family="Consolas, 'Courier New', monospace" font-size="18" letter-spacing="1">Every 8 seconds, your last movements replay as a ghost.</text>
+  <text x="80" y="428" fill="#8f8aa9" font-family="Consolas, 'Courier New', monospace" font-size="18" letter-spacing="1">Collect energy. Dash through hostiles. Survive the echo.</text>
+
+  <g>
+    <rect x="80" y="470" width="250" height="44" rx="4" fill="#22d3ee" fill-opacity="0.1" stroke="#22d3ee" stroke-opacity="0.5"/>
+    <text x="100" y="498" fill="#67e8f9" font-family="Consolas, 'Courier New', monospace" font-size="16" letter-spacing="3">ECHO LOOP 8.0s</text>
+
+    <rect x="346" y="470" width="190" height="44" rx="4" fill="#a855f7" fill-opacity="0.1" stroke="#a855f7" stroke-opacity="0.5"/>
+    <text x="366" y="498" fill="#c4b5fd" font-family="Consolas, 'Courier New', monospace" font-size="16" letter-spacing="3">FREE TO PLAY</text>
+  </g>
+
+  <text x="80" y="578" fill="#5a5670" font-family="Consolas, 'Courier New', monospace" font-size="14" letter-spacing="2">HTML5 CANVAS · VANILLA JS · LOCAL SAVE · NO DOWNLOADS</text>
+
+  <rect x="24" y="24" width="1152" height="582" fill="none" stroke="#22d3ee" stroke-opacity="0.28"/>
+  <path d="M24 72V24h48M1128 24h48v48M1176 558v48h-48M72 606H24v-48" fill="none" stroke="#a855f7" stroke-width="2" stroke-opacity="0.5"/>
+</svg>

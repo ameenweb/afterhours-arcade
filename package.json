@@ -1,0 +1,16 @@
+{
+  "name": "afterhours-arcade",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "A neon survival arcade browser game where your past becomes your biggest enemy.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test:smoke": "node tools/smoke-test.mjs"
+  },
+  "devDependencies": {
+    "vite": "^7.1.7"
+  }
+}
