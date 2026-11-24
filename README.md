@@ -161,6 +161,7 @@ The optional `.github/workflows/deploy.yml` workflow can deploy from GitHub Acti
 - Effects quality can be set to **Low** for slower devices.
 - The HUD uses text values alongside bars, and every control has an accessible label.
 - The game is fully playable with a keyboard, and touch controls appear only on coarse-pointer devices.
+- The live build scores **100** for accessibility, best practices and SEO in Lighthouse.
 
 ## License
 
